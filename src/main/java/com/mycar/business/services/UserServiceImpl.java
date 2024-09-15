@@ -7,6 +7,7 @@ import com.mycar.business.controllers.mappers.UserUserRegisterDTOMapper;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,9 +21,13 @@ public class UserServiceImpl implements UserService{
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
         UserEntity user = userUserRegisterDTOMapper.userRegisterDTOToUserEntity(userRegisterDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity userSaved = userRepository.save(user);
         return userUserDTOMapper.userEntityToUserDTO(userSaved);
     }
