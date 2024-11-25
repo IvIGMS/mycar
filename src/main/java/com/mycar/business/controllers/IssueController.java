@@ -7,10 +7,10 @@ import com.mycar.business.services.IssueService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/issues")
@@ -22,10 +22,15 @@ public class IssueController {
     @Autowired
     private IssueService issueService;
 
+    @Autowired
+    private ControllerHelper controllerHelper;
+
     @GetMapping()
-    private ResponseEntity<List<IssueQueryDTO>> getIssues(HttpServletRequest request){
+    private ResponseEntity<Page<IssueQueryDTO>> getIssues(HttpServletRequest request){
         UserEntity user = authService.getLoggedInUser(request);
-        List<IssueQueryDTO> issues = issueService.getIssues(user.getId());
+        Pageable pageable = controllerHelper.getPageable(request);
+
+        Page<IssueQueryDTO> issues = issueService.getIssues(user.getId(), pageable);
         return ResponseEntity.ok(issues);
     }
 }
