@@ -1,8 +1,9 @@
 package com.mycar.business.controllers;
 
+import com.mycar.business.controllers.dto.IssueCreateDTO;
 import com.mycar.business.controllers.dto.IssueQueryDTO;
 import com.mycar.business.entities.UserEntity;
-import com.mycar.business.services.AuthService;
+import com.mycar.business.services.impl.AuthService;
 import com.mycar.business.services.IssueService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -32,5 +33,14 @@ public class IssueController {
 
         Page<IssueQueryDTO> issues = issueService.getIssues(user.getId(), pageable);
         return ResponseEntity.ok(issues);
+    }
+
+    @PostMapping("/create")
+    private ResponseEntity<IssueQueryDTO> create(HttpServletRequest request, @RequestBody IssueCreateDTO issueCreateDTO){
+        UserEntity user = authService.getLoggedInUser(request);
+
+        IssueQueryDTO issue = issueService.createIssue(user, issueCreateDTO);
+
+        return ResponseEntity.ok(IssueQueryDTO.builder().build());
     }
 }
