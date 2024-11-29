@@ -2,7 +2,6 @@ package com.mycar.business.services.impl;
 
 import com.mycar.business.controllers.dto.IssueCreateDTO;
 import com.mycar.business.controllers.dto.IssueQueryDTO;
-import com.mycar.business.controllers.mappers.IssueIssueCreateDTOMapper;
 import com.mycar.business.controllers.mappers.IssueIssueQueryDTOMapper;
 import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.UserEntity;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -89,6 +89,13 @@ public class IssueServiceImpl implements IssueService {
             }
         }
         return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issueSaved);
+    }
+
+    @Override
+    public IssueQueryDTO getIssueById(Long userId, Long issueId) {
+        // Todo hay que tratar que solo pueda acceder al recuros si el recuros es porpiedad de ese user.
+        Optional<IssueEntity> issue = issueRepository.findById(issueId);
+        return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issue.orElse(null));
     }
 
     private LocalDateTime calculateTime(int days) {
