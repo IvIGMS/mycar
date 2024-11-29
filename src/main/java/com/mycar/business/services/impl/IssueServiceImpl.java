@@ -2,6 +2,8 @@ package com.mycar.business.services.impl;
 
 import com.mycar.business.controllers.dto.IssueCreateDTO;
 import com.mycar.business.controllers.dto.IssueQueryDTO;
+import com.mycar.business.controllers.mappers.IssueIssueCreateDTOMapper;
+import com.mycar.business.controllers.mappers.IssueIssueQueryDTOMapper;
 import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.IssueRepository;
@@ -11,6 +13,7 @@ import com.mycar.business.services.TypeService;
 import com.mycar.business.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,9 @@ public class IssueServiceImpl implements IssueService {
     @Autowired
     StatusService statusService;
 
+    @Autowired
+    IssueIssueQueryDTOMapper issueIssueQueryDTOMapper;
+
     @Override
     public Page<IssueQueryDTO> getIssues(Long userId, Pageable pageable) {
         Page<IssueQueryDTO> issues = issueRepository.getIssues(userId, pageable);
@@ -40,14 +46,28 @@ public class IssueServiceImpl implements IssueService {
 
     @Override
     public IssueQueryDTO createIssue(UserEntity user, IssueCreateDTO issueCreateDTO) {
-        IssueEntity issueSaved;
+        IssueEntity issueSaved = null;
         if(issueCreateDTO.getTypeId()!=null){
             if(issueCreateDTO.getTypeId()==1){
                 // Type distance
                 validateIssueDistance(issueCreateDTO);
-                // Todo: hacer lo mismo que en el otro pero para el de distance
-                issueSaved = issueRepository.save(IssueEntity.builder().build()); // Change obj
-                log.info("Issue con tipo distance guardado correctamente");
+
+                IssueEntity issue = IssueEntity.builder()
+                        .name(issueCreateDTO.getName())
+                        .description(issueCreateDTO.getDescription())
+                        .typeEntity(typeService.getTypeById(issueCreateDTO.getTypeId()))
+                        .statusEntity(statusService.getStatusById(1L))
+                        .currentDistance(issueCreateDTO.getCurrentDistance())
+                        .notificationDistance(issueCreateDTO.getNotificationDistance())
+                        .userEntity(user)
+                        .build();
+
+                try{
+                    issueSaved = issueRepository.save(issue);
+                    log.info("Issue con tipo distance guardado correctamente");
+                } catch (DataIntegrityViolationException e){
+                    log.error("El issue no ha podido guardarse, tiene la llave duplicada");
+                }
             } else {
                 // Type time
                 validateIssueTime(issueCreateDTO);
@@ -57,31 +77,33 @@ public class IssueServiceImpl implements IssueService {
                         .description(issueCreateDTO.getDescription())
                         .typeEntity(typeService.getTypeById(issueCreateDTO.getTypeId()))
                         .statusEntity(statusService.getStatusById(1L))
-                        .notificationDate(calculateDistance(issueCreateDTO.getNotificationDateDays()))
+                        .notificationDate(calculateTime(issueCreateDTO.getNotificationDateDays()))
                         .userEntity(user)
                         .build();
-
-                issueSaved = issueRepository.save(issue);
-                log.info("Issue con tipo time guardado correctamente");
+                try{
+                    issueSaved = issueRepository.save(issue);
+                    log.info("Issue con tipo time guardado correctamente");
+                } catch (DataIntegrityViolationException e){
+                    log.error("El issue no ha podido guardarse, tiene la llave duplicada");
+                }
             }
         }
-        // Todo: pasar el IssueSaved al DTO que tenemos que sacar por pantalla.
-        return null;
+        return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issueSaved);
     }
 
-    private LocalDateTime calculateDistance(int days) {
+    private LocalDateTime calculateTime(int days) {
         LocalDateTime now = LocalDateTime.now();
         return now.plusDays(days);
     }
 
-    private void validateIssueTime(IssueCreateDTO issueCreateDTO) {
-        if(issueCreateDTO.getTypeId()==null || issueCreateDTO.getName()==null || issueCreateDTO.getNotificationDateDays()==null){
+    private void validateIssueDistance(IssueCreateDTO issueCreateDTO) {
+        if(issueCreateDTO.getTypeId()!=1 || issueCreateDTO.getName()==null || issueCreateDTO.getNotificationDistance()==null || issueCreateDTO.getCurrentDistance()==null){
             throw new IllegalArgumentException("No has introducido los campos necesarios");
         }
     }
 
-    private void validateIssueDistance(IssueCreateDTO issueCreateDTO) {
-        if(issueCreateDTO.getTypeId()==null || issueCreateDTO.getName()==null || issueCreateDTO.getNotificationDistance()==null || issueCreateDTO.getCurrentDistance()==null){
+    private void validateIssueTime(IssueCreateDTO issueCreateDTO) {
+        if(issueCreateDTO.getTypeId()!=2 || issueCreateDTO.getName()==null || issueCreateDTO.getNotificationDateDays()==null){
             throw new IllegalArgumentException("No has introducido los campos necesarios");
         }
     }
