@@ -17,4 +17,9 @@ public interface IssueRepository extends JpaRepository<IssueEntity, Long> {
             "JOIN StatusEntity s ON i.statusEntity.id = s.id " +
             "WHERE i.userEntity.id = :userId")
     Page<IssueQueryDTO> getIssues(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(" SELECT CASE WHEN COUNT(I) > 0 THEN true ELSE false END" +
+            " FROM IssueEntity I" +
+            " WHERE I.userEntity.id = ?1 AND I.id = ?2")
+    boolean existIssueByUsername(Long userId, Long issueId);
 }

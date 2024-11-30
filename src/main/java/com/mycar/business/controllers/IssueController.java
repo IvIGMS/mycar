@@ -67,7 +67,7 @@ public class IssueController {
         IssueQueryDTO issue = issueService.getIssueById(user.getId(), id);
         if (issue==null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No se encontró el Issue con ID: " + id);
+                    .body("No se encontró el Issue con ID: " + id + ". Es probable que pertenezca a otro usuario.");
         }
         return ResponseEntity.ok(issue);
     }

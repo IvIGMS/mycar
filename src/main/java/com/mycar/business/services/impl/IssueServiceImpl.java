@@ -93,9 +93,15 @@ public class IssueServiceImpl implements IssueService {
 
     @Override
     public IssueQueryDTO getIssueById(Long userId, Long issueId) {
-        // Todo hay que tratar que solo pueda acceder al recuros si el recuros es porpiedad de ese user.
-        Optional<IssueEntity> issue = issueRepository.findById(issueId);
-        return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issue.orElse(null));
+        if(existIssueByUsername(userId, issueId)){
+            Optional<IssueEntity> issue = issueRepository.findById(issueId);
+            return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issue.orElse(null));
+        }
+        return null;
+    }
+
+    private boolean existIssueByUsername(Long userId, Long issueId) {
+        return issueRepository.existIssueByUsername(userId, issueId);
     }
 
     private LocalDateTime calculateTime(int days) {
