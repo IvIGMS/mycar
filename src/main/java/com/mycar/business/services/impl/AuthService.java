@@ -19,17 +19,27 @@ public class AuthService {
 
     // Método para obtener el UserEntity del usuario actual logueado
     public UserEntity getLoggedInUser(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Remover el prefijo "Bearer "
-            String email = jwtUtils.extractEmail(token);
-
-            return userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el email: " + email));
+        // Busca la cookie con el token
+        String token = null;
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) { // Busca la cookie llamada "token"
+                    token = cookie.getValue();
+                    break;
+                }
+            }
         }
 
-        throw new RuntimeException("Token JWT no válido o no proporcionado");
+        // Si no se encuentra el token, lanza una excepción
+        if (token == null) {
+            throw new RuntimeException("Token JWT no válido o no proporcionado");
+        }
+
+        // Extrae el email del token
+        String email = jwtUtils.extractEmail(token);
+
+        // Busca el usuario por email
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el email: " + email));
     }
 }
-
