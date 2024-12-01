@@ -1,5 +1,6 @@
 package com.mycar.business.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
