@@ -2,6 +2,7 @@ package com.mycar.business.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -25,34 +27,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-
-        String email = null;
         String jwt = null;
+        String email = null;
 
-        // El JWT generalmente viene con el prefijo "Bearer "
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        // Obtener el token desde las cookies
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) { // Busca la cookie con nombre "token"
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // Si hay un token y el contexto de seguridad no está autenticado
+        if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                email = jwtUtils.extractEmail(jwt);
+                email = jwtUtils.extractEmail(jwt); // Extraer el email del token
             } catch (Exception e) {
                 logger.error("No se pudo extraer el username del token JWT", e);
             }
-        }
 
-        // Si obtenemos el username y el contexto de seguridad no está autenticado
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+            if (email != null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 
-            // Validamos el token y autenticamos al usuario si es válido
-            if (jwtUtils.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                // Validar el token y autenticar al usuario si es válido
+                if (jwtUtils.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         }
 
+        // Continuar con el filtro
         filterChain.doFilter(request, response);
     }
 }
