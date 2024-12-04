@@ -44,6 +44,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Permitir acceso al login y registro
+                        .requestMatchers("/api/users").permitAll() // Permitir acceso al login y registro
                         .anyRequest().authenticated()
                         .and()
                         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class))
