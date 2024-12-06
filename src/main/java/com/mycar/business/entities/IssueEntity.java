@@ -43,8 +43,8 @@ public class IssueEntity {
 
     // Relación con la tabla 'User'
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity userEntity;
+    @JoinColumn(name = "car_id", nullable = false)
+    private CarEntity carEntity;
 
     // Relación con la tabla 'Status'
     @ManyToOne(fetch = FetchType.LAZY)
