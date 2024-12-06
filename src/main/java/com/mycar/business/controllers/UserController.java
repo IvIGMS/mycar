@@ -1,8 +1,7 @@
 package com.mycar.business.controllers;
 
-import com.mycar.business.controllers.dto.UserDTO;
-import com.mycar.business.controllers.dto.UserRegisterDTO;
-import com.mycar.business.entities.UserEntity;
+import com.mycar.business.controllers.dto.user.UserDTO;
+import com.mycar.business.controllers.dto.user.UserRegisterDTO;
 import com.mycar.business.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

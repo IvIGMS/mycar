@@ -1,15 +1,13 @@
 package com.mycar.business.services.impl;
 
-import com.mycar.business.controllers.dto.IssueCreateDTO;
-import com.mycar.business.controllers.dto.IssueQueryDTO;
+import com.mycar.business.controllers.dto.issue.IssueCreateDTO;
+import com.mycar.business.controllers.dto.issue.IssueQueryDTO;
 import com.mycar.business.controllers.mappers.IssueIssueQueryDTOMapper;
+import com.mycar.business.entities.CarEntity;
 import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.IssueRepository;
-import com.mycar.business.services.IssueService;
-import com.mycar.business.services.StatusService;
-import com.mycar.business.services.TypeService;
-import com.mycar.business.services.UserService;
+import com.mycar.business.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,13 +25,13 @@ public class IssueServiceImpl implements IssueService {
     IssueRepository issueRepository;
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     TypeService typeService;
 
     @Autowired
     StatusService statusService;
+
+    @Autowired
+    CarService carService;
 
     @Autowired
     IssueIssueQueryDTOMapper issueIssueQueryDTOMapper;
@@ -47,7 +45,9 @@ public class IssueServiceImpl implements IssueService {
     @Override
     public IssueQueryDTO createIssue(UserEntity user, IssueCreateDTO issueCreateDTO) {
         IssueEntity issueSaved = null;
-        if(issueCreateDTO.getTypeId()!=null){
+        CarEntity car = carService.getCarIfThisOwnerUser(user.getId(), issueCreateDTO.getCarId());
+
+        if(issueCreateDTO.getTypeId()!=null && car!=null){
             if(issueCreateDTO.getTypeId()==1){
                 // Type distance
                 validateIssueDistance(issueCreateDTO);
@@ -59,7 +59,7 @@ public class IssueServiceImpl implements IssueService {
                         .statusEntity(statusService.getStatusById(1L))
                         .currentDistance(issueCreateDTO.getCurrentDistance())
                         .notificationDistance(issueCreateDTO.getNotificationDistance())
-                        .userEntity(user)
+                        .carEntity(car)
                         .build();
 
                 try{
@@ -78,7 +78,7 @@ public class IssueServiceImpl implements IssueService {
                         .typeEntity(typeService.getTypeById(issueCreateDTO.getTypeId()))
                         .statusEntity(statusService.getStatusById(1L))
                         .notificationDate(calculateTime(issueCreateDTO.getNotificationDateDays()))
-                        .userEntity(user)
+                        .carEntity(car)
                         .build();
                 try{
                     issueSaved = issueRepository.save(issue);
