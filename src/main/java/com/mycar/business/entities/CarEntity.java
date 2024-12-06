@@ -36,6 +36,9 @@ public class CarEntity {
     @Column(nullable = false, name = "km")
     Integer km;
 
+    @Column(name = "is_active")
+    private Boolean isActive = false;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

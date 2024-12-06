@@ -1,9 +1,8 @@
 package com.mycar.business.controllers;
 
-import com.mycar.business.controllers.dto.IssueCreateDTO;
-import com.mycar.business.controllers.dto.IssueQueryDTO;
+import com.mycar.business.controllers.dto.issue.IssueCreateDTO;
+import com.mycar.business.controllers.dto.issue.IssueQueryDTO;
 import com.mycar.business.controllers.utils.ControllerHelper;
-import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.services.impl.AuthService;
 import com.mycar.business.services.IssueService;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/issues")

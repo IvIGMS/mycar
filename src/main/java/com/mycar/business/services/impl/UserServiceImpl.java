@@ -1,7 +1,7 @@
 package com.mycar.business.services.impl;
 
-import com.mycar.business.controllers.dto.UserDTO;
-import com.mycar.business.controllers.dto.UserRegisterDTO;
+import com.mycar.business.controllers.dto.user.UserDTO;
+import com.mycar.business.controllers.dto.user.UserRegisterDTO;
 import com.mycar.business.controllers.mappers.UserUserDTOMapper;
 import com.mycar.business.controllers.mappers.UserUserRegisterDTOMapper;
 import com.mycar.business.entities.UserEntity;
