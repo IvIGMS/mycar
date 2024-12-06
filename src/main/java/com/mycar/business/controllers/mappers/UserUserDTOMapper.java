@@ -1,6 +1,6 @@
 package com.mycar.business.controllers.mappers;
 
-import com.mycar.business.controllers.dto.UserDTO;
+import com.mycar.business.controllers.dto.user.UserDTO;
 import com.mycar.business.entities.UserEntity;
 import org.mapstruct.Mapper;
 

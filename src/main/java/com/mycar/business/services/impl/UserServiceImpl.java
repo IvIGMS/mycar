@@ -1,18 +1,20 @@
-package com.mycar.business.services;
+package com.mycar.business.services.impl;
 
-import com.mycar.business.controllers.dto.UserDTO;
-import com.mycar.business.controllers.dto.UserRegisterDTO;
+import com.mycar.business.controllers.dto.user.UserDTO;
+import com.mycar.business.controllers.dto.user.UserRegisterDTO;
 import com.mycar.business.controllers.mappers.UserUserDTOMapper;
 import com.mycar.business.controllers.mappers.UserUserRegisterDTOMapper;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.UserRepository;
+import com.mycar.business.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
     UserUserRegisterDTOMapper userUserRegisterDTOMapper;
     @Autowired
@@ -20,9 +22,13 @@ public class UserServiceImpl implements UserService{
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
         UserEntity user = userUserRegisterDTOMapper.userRegisterDTOToUserEntity(userRegisterDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity userSaved = userRepository.save(user);
         return userUserDTOMapper.userEntityToUserDTO(userSaved);
     }

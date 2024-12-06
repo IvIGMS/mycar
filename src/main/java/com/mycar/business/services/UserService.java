@@ -1,8 +1,7 @@
 package com.mycar.business.services;
 
-import com.mycar.business.controllers.dto.UserDTO;
-import com.mycar.business.controllers.dto.UserRegisterDTO;
-import com.mycar.business.entities.UserEntity;
+import com.mycar.business.controllers.dto.user.UserDTO;
+import com.mycar.business.controllers.dto.user.UserRegisterDTO;
 import org.springframework.stereotype.Service;
 
 @Service

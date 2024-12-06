@@ -38,7 +38,7 @@ public class UserEntity {
     private Boolean isActive = false;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IssueEntity> relatedEntities;
+    private List<CarEntity> cars;
 
     @CreationTimestamp
     @Column(updatable = false)
