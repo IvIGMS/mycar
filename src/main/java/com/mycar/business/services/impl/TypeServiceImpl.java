@@ -10,8 +10,13 @@ import java.util.Optional;
 
 @Service
 public class TypeServiceImpl implements TypeService {
-    @Autowired
-    TypeRepository typeRepository;
+    private final TypeRepository typeRepository;
+
+    public TypeServiceImpl(TypeRepository typeRepository){
+        this.typeRepository = typeRepository;
+    }
+
+
     @Override
     public TypeEntity getTypeById(Long id) {
         return typeRepository.findById(id).orElse(null);
