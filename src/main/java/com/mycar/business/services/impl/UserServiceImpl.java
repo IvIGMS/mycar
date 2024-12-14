@@ -15,18 +15,23 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    UserUserRegisterDTOMapper userUserRegisterDTOMapper;
-    @Autowired
-    UserUserDTOMapper userUserDTOMapper;
-    @Autowired
-    UserRepository userRepository;
+    private final UserUserRegisterDTOMapper userUserRegisterDTOMapper;
+    private final UserUserDTOMapper userUserDTOMapper;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserUserRegisterDTOMapper userUserRegisterDTOMapper, UserUserDTOMapper userUserDTOMapper,
+            UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userUserRegisterDTOMapper = userUserRegisterDTOMapper;
+        this.userUserDTOMapper = userUserDTOMapper;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
+        // Fixme: it's probably to thow an exception, make a try catch.
         UserEntity user = userUserRegisterDTOMapper.userRegisterDTOToUserEntity(userRegisterDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity userSaved = userRepository.save(user);

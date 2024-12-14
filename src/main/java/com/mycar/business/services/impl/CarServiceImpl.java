@@ -21,11 +21,13 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class CarServiceImpl implements CarService {
-    @Autowired
-    CarRepository carRepository;
+    private final CarRepository carRepository;
+    private final CarCarQueryDTOMapper carCarQueryDTOMapper;
 
-    @Autowired
-    CarCarQueryDTOMapper carCarQueryDTOMapper;
+    public CarServiceImpl(CarRepository carRepository, CarCarQueryDTOMapper carCarQueryDTOMapper) {
+        this.carRepository = carRepository;
+        this.carCarQueryDTOMapper = carCarQueryDTOMapper;
+    }
 
     @Override
     public CarQueryDTO createCar(UserEntity user, CarCreateDTO carCreateDTO) {
@@ -69,7 +71,6 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarEntity getCarIfThisOwnerUser(Long userId, Long carId) {
-        Optional<CarEntity> car = carRepository.findCarByCarIdAndUserId(userId, carId);
         return carRepository.findCarByCarIdAndUserId(userId, carId).orElse(null);
     }
 
