@@ -1,5 +1,6 @@
 package com.mycar.business.services.impl;
 
+import com.mycar.business.controllers.dto.car.CarAddKm;
 import com.mycar.business.controllers.dto.car.CarCreateDTO;
 import com.mycar.business.controllers.dto.car.CarQueryDTO;
 import com.mycar.business.controllers.mappers.CarCarQueryDTOMapper;
@@ -27,6 +28,7 @@ class CarServiceImplTest {
     private UserEntity user;
     CarQueryDTO car1 = new CarQueryDTO();
     CarEntity carEntity = new CarEntity();
+    CarAddKm carAddKm = new CarAddKm();
 
     private CarCarQueryDTOMapper carCarQueryDTOMapper;
     private CarServiceImpl carService;
@@ -53,6 +55,9 @@ class CarServiceImplTest {
         carEntity.setCompanyName("Seat");
         carEntity.setModelName("Leon");
         carEntity.setUserEntity(user);
+
+        carAddKm.setCarId(1L);
+        carAddKm.setKm(30000);
 
         carCarQueryDTOMapper = new CarCarQueryDTOMapperImpl();
         carService = new CarServiceImpl(carRepository, carCarQueryDTOMapper);
@@ -154,6 +159,43 @@ class CarServiceImplTest {
     void getCarIfThisOwnerUser_ko() {
         Mockito.when(carRepository.findCarByCarIdAndUserId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Optional.empty());
         CarEntity results = carService.getCarIfThisOwnerUser(1L, 1L);
+        assertNull(results);
+    }
+
+    @Test
+    void getAddKm_ok() {
+        Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
+        Mockito.when(carRepository.save(carEntity)).thenReturn(carEntity);
+
+        CarQueryDTO results = carService.addKm(user, carAddKm);
+
+        assertNotNull(results);
+        assertEquals(30000, results.getKm());
+    }
+
+    @Test
+    void getAddKm_koCarNull() {
+        Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.empty());
+        CarQueryDTO results = carService.addKm(user, carAddKm);
+        assertNull(results);
+    }
+
+    @Test
+    void getAddKm_koDataIntegrityViolationException() {
+        Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
+        Mockito.when(carRepository.save(carEntity)).thenThrow(new DataIntegrityViolationException("Some error"));
+
+        CarQueryDTO results = carService.addKm(user, carAddKm);
+
+        assertNull(results);
+    }
+
+    @Test
+    void getAddKm_koSameKm() {
+        Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
+        carAddKm.setKm(20000);
+        CarQueryDTO results = carService.addKm(user, carAddKm);
+
         assertNull(results);
     }
 }
