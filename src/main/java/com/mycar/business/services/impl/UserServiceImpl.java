@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
         // Fixme: it's probably to thow an exception, make a try catch.
         UserEntity user = userUserRegisterDTOMapper.userRegisterDTOToUserEntity(userRegisterDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Fixme: in production this is false.
+        user.setIsActive(true);
         UserEntity userSaved = userRepository.save(user);
         return userUserDTOMapper.userEntityToUserDTO(userSaved);
     }
