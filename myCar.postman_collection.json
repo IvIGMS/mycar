@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "1a169728-4707-4f74-96bb-1a205ca72d0d",
+		"name": "myCar",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20256494",
+		"_collection_link": "https://crimson-meteor-328166.postman.co/workspace/Personal-Workspace~22e2dd9a-13e7-40ab-b8f5-2b04469cb563/collection/20256494-1a169728-4707-4f74-96bb-1a205ca72d0d?action=share&source=collection_link&creator=20256494"
+	},
+	"item": [
+		{
+			"name": "business",
+			"item": [
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "createUser",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"merferma\",\r\n  \"email\": \"merferma@gmail.com\",\r\n  \"password\": \"mySecretPassword321\",\r\n  \"firstName\": \"Mercedes\",\r\n  \"lastName\": \"Fernandez\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8081/api/users",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getUserById",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzI2MTgwNjg4LCJleHAiOjE3MjYyNjcwODh9.ZhSJsLVkAnc7BBJLZ8tJB4lBkr3478-hP4dfA-baVDaJ3uyXOzjOlFy-lvP55OmAIs01otSw8KqCa9P37kp4kQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzI2MTg1MTI0LCJleHAiOjE3MjYyNzE1MjR9.nsfX2FzuH-mRUu7I4OOS3EM4kbiYyC28M4stxKhb4qko7S80V68kqrMVZ5ptL2Q1UFd0TCe7SKlxuG6HvqHsuQ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8081/api/users/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"users",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "issue",
+					"item": [
+						{
+							"name": "createIssue",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8081/api/issues",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"issues"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getIssues",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImZyaWFzZ2lsaXZhbkBnbWFpbC5jb20iLCJzdWIiOiJmcmlhc2dpbGl2YW5AZ21haWwuY29tIiwiaWF0IjoxNzMyNTYzNDUxLCJleHAiOjE3MzI1NjcwNTF9.yjsas_DXqiOLp_NRbuhypmHV5G3uB9og0p8VdnKdn_oRJ_cNts0oHfl2Dvy4Ref7daPDTq3NlJ1W8F6o_HhbeA",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8081/api/issues",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"issues"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "friasgilivan@gmail.com",
+											"description": "merferma@gmail.com, friasgilivan@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "mySecretPassword321",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:8081/api/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "notifications",
+			"item": []
+		}
+	]
+}

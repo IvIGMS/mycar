@@ -10,8 +10,11 @@ import java.util.Optional;
 
 @Service
 public class StatusServiceImpl implements StatusService {
-    @Autowired
-    StatusRepository statusRepository;
+    private final StatusRepository statusRepository;
+
+    public StatusServiceImpl(StatusRepository statusRepository){
+        this.statusRepository = statusRepository;
+    }
 
     @Override
     public StatusEntity getStatusById(Long id) {

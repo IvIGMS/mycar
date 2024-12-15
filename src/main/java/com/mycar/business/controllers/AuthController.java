@@ -46,5 +46,18 @@ public class AuthController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        // Invalida la cookie configurando su expiración en el pasado
+        Cookie jwtCookie = new Cookie("token", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true); // Usar true si tienes HTTPS
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Esto hace que la cookie expire inmediatamente
+        response.addCookie(jwtCookie);
+
+        return ResponseEntity.ok("Logout successful");
+    }
 }
 

@@ -21,20 +21,19 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class IssueServiceImpl implements IssueService {
-    @Autowired
-    IssueRepository issueRepository;
+    private final IssueRepository issueRepository;
+    private final TypeService typeService;
+    private final StatusService statusService;
+    private final CarService carService;
+    private final IssueIssueQueryDTOMapper issueIssueQueryDTOMapper;
 
-    @Autowired
-    TypeService typeService;
-
-    @Autowired
-    StatusService statusService;
-
-    @Autowired
-    CarService carService;
-
-    @Autowired
-    IssueIssueQueryDTOMapper issueIssueQueryDTOMapper;
+    public IssueServiceImpl(IssueRepository issueRepository, TypeService typeService, StatusService statusService, CarService carService, IssueIssueQueryDTOMapper issueIssueQueryDTOMapper) {
+        this.issueRepository = issueRepository;
+        this.typeService = typeService;
+        this.statusService = statusService;
+        this.carService = carService;
+        this.issueIssueQueryDTOMapper = issueIssueQueryDTOMapper;
+    }
 
     @Override
     public Page<IssueQueryDTO> getIssues(Long userId, Pageable pageable) {

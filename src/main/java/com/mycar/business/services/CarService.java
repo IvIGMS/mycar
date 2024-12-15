@@ -1,5 +1,6 @@
 package com.mycar.business.services;
 
+import com.mycar.business.controllers.dto.car.CarAddKm;
 import com.mycar.business.controllers.dto.car.CarCreateDTO;
 import com.mycar.business.controllers.dto.car.CarQueryDTO;
 import com.mycar.business.entities.CarEntity;
@@ -17,4 +18,6 @@ public interface CarService {
     List<CarQueryDTO> getCars(Long userId);
 
     CarEntity getCarIfThisOwnerUser(Long userId, Long carId);
+
+    CarQueryDTO addKm(UserEntity user, CarAddKm carAddKm);
 }
