@@ -78,9 +78,9 @@ public class CarServiceImpl implements CarService {
         if(car!=null){
             car.setKm(carAddKm.getKm());
             try{
-                carRepository.save(car);
+                CarEntity savedCar = carRepository.save(car);
                 log.info("Se han actualizado los km del vehículo");
-                return carCarQueryDTOMapper.carEntityToCarQueryDTO(car);
+                return carCarQueryDTOMapper.carEntityToCarQueryDTO(savedCar);
             } catch(DataIntegrityViolationException e){
                 log.error("No han podido actualizarse los km del vehículo");
                 return null;
