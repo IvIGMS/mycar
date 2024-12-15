@@ -10,7 +10,7 @@
 
     Onboarding
 
-- git clone <URL_DEL_REPOSITORIO> (clonar el repo de la API)
+- git clone <URL_DEL_REPOSITORIO> (clonar el repo de la API y usar DEVELOP branch)
 - docker-compose up -d (ejecutar el docker-compose.yml que nos crea una imagen docker
 y ejecuta el contenedor para tener una bbdd sin necesidad de tener postgre instalado)
 - Ejecutar el back de la forma que quieras (recomendable con intellij, de momento
