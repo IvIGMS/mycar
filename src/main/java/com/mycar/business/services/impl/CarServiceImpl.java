@@ -1,5 +1,6 @@
 package com.mycar.business.services.impl;
 
+import com.mycar.business.controllers.dto.car.CarAddKm;
 import com.mycar.business.controllers.dto.car.CarCreateDTO;
 import com.mycar.business.controllers.dto.car.CarQueryDTO;
 import com.mycar.business.controllers.mappers.CarCarQueryDTOMapper;
@@ -7,16 +8,13 @@ import com.mycar.business.entities.CarEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.CarRepository;
 import com.mycar.business.services.CarService;
-import com.mycar.business.services.IssueService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -72,6 +70,24 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarEntity getCarIfThisOwnerUser(Long userId, Long carId) {
         return carRepository.findCarByCarIdAndUserId(userId, carId).orElse(null);
+    }
+
+    @Override
+    public CarQueryDTO addKm(UserEntity user, CarAddKm carAddKm) {
+        CarEntity car = getCarIfThisOwnerUser(user.getId(), carAddKm.getCarId());
+        if(car!=null){
+            car.setKm(carAddKm.getKm());
+            try{
+                carRepository.save(car);
+                log.info("Se han actualizado los km del vehículo");
+                return carCarQueryDTOMapper.carEntityToCarQueryDTO(car);
+            } catch(DataIntegrityViolationException e){
+                log.error("No han podido actualizarse los km del vehículo");
+                return null;
+            }
+        }
+        log.error("No han podido actualizarse los km del vehículo porque no existe o no pertenece a este usuario.");
+        return null;
     }
 
     private boolean existCarByUsername(Long userId, Long carId) {

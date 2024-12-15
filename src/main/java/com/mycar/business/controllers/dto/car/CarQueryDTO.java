@@ -20,16 +20,4 @@ public class CarQueryDTO {
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<IssueEntity> issues;
-
-    public CarQueryDTO(Long id, String companyName, String modelName, Long userId, Integer km, boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.companyName = companyName;
-        this.modelName = modelName;
-        this.userId = userId;
-        this.km = km;
-        this.isActive = isActive;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
 }

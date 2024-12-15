@@ -1,8 +1,8 @@
 package com.mycar.business.controllers;
 
+import com.mycar.business.controllers.dto.car.CarAddKm;
 import com.mycar.business.controllers.dto.car.CarCreateDTO;
 import com.mycar.business.controllers.dto.car.CarQueryDTO;
-import com.mycar.business.entities.CarEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.services.CarService;
 import com.mycar.business.services.impl.AuthService;
@@ -65,5 +65,22 @@ public class CarController {
         UserEntity user = authService.getLoggedInUser(request);
         List<CarQueryDTO> cars = carService.getCars(user.getId());
         return ResponseEntity.ok(cars);
+    }
+
+    @PatchMapping("/addKm")
+    public ResponseEntity<Object> addKm(HttpServletRequest request, @Valid @RequestBody CarAddKm carAddKm){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.addKm(user, carAddKm);
+
+        if (car!=null){
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(car.getId())
+                    .toUri();
+            return ResponseEntity.created(location).body(car);
+        } else {
+            return ResponseEntity.badRequest().body("Ha habido un error al actualizar los km del vehículo");
+        }
     }
 }
