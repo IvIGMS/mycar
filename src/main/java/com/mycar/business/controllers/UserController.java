@@ -27,7 +27,8 @@ public class UserController {
         return ResponseEntity.ok().body(userResult);
     }
 
-    @PutMapping("/activate/{id}")
+    @PatchMapping("/activate/{id}")
+    // fixme: useless for now, it need a refactor
     public ResponseEntity<String> activateUser(@PathVariable Long id){
         String result = userService.activateUser(id);
         return ResponseEntity.ok().body(result);
