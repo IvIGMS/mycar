@@ -57,7 +57,7 @@ class CarServiceImplTest {
         carEntity.setUserEntity(user);
 
         carAddKm.setCarId(1L);
-        carAddKm.setKm(20000);
+        carAddKm.setKm(30000);
 
         carCarQueryDTOMapper = new CarCarQueryDTOMapperImpl();
         carService = new CarServiceImpl(carRepository, carCarQueryDTOMapper);
@@ -170,7 +170,7 @@ class CarServiceImplTest {
         CarQueryDTO results = carService.addKm(user, carAddKm);
 
         assertNotNull(results);
-        assertEquals(20000, results.getKm());
+        assertEquals(30000, results.getKm());
     }
 
     @Test
@@ -185,6 +185,15 @@ class CarServiceImplTest {
         Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
         Mockito.when(carRepository.save(carEntity)).thenThrow(new DataIntegrityViolationException("Some error"));
 
+        CarQueryDTO results = carService.addKm(user, carAddKm);
+
+        assertNull(results);
+    }
+
+    @Test
+    void getAddKm_koSameKm() {
+        Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
+        carAddKm.setKm(20000);
         CarQueryDTO results = carService.addKm(user, carAddKm);
 
         assertNull(results);

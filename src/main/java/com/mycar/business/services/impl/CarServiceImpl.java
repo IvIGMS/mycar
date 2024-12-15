@@ -76,15 +76,19 @@ public class CarServiceImpl implements CarService {
     public CarQueryDTO addKm(UserEntity user, CarAddKm carAddKm) {
         CarEntity car = getCarIfThisOwnerUser(user.getId(), carAddKm.getCarId());
         if(car!=null){
-            car.setKm(carAddKm.getKm());
-            try{
-                CarEntity savedCar = carRepository.save(car);
-                log.info("Se han actualizado los km del vehículo");
-                return carCarQueryDTOMapper.carEntityToCarQueryDTO(savedCar);
-            } catch(DataIntegrityViolationException e){
-                log.error("No han podido actualizarse los km del vehículo");
-                return null;
+            if(!car.getKm().equals(carAddKm.getKm())){
+                car.setKm(carAddKm.getKm());
+                try{
+                    CarEntity savedCar = carRepository.save(car);
+                    log.info("Se han actualizado los km del vehículo");
+                    return carCarQueryDTOMapper.carEntityToCarQueryDTO(savedCar);
+                } catch(DataIntegrityViolationException e){
+                    log.error("No han podido actualizarse los km del vehículo");
+                    return null;
+                }
             }
+            log.error("No han podido actualizarse los km del vehículo porque no se han modificado");
+            return null;
         }
         log.error("No han podido actualizarse los km del vehículo porque no existe o no pertenece a este usuario.");
         return null;
