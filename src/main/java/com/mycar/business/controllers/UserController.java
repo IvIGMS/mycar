@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 @Slf4j
 public class UserController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
-    @PostMapping("")
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
+
+    @PostMapping()
     public ResponseEntity<UserDTO> createUser(@RequestBody UserRegisterDTO userRegisterDTO){
         UserDTO userResult = userService.createUser(userRegisterDTO);
         return ResponseEntity.ok().body(userResult);
@@ -28,7 +31,7 @@ public class UserController {
     }
 
     @PatchMapping("/activate/{id}")
-    // fixme: useless for now, it need a refactor
+    // fixme: useless for now, it need a refactor and wrong Response, It need a badRequest to.
     public ResponseEntity<String> activateUser(@PathVariable Long id){
         String result = userService.activateUser(id);
         return ResponseEntity.ok().body(result);
