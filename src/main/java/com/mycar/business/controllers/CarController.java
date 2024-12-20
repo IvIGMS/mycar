@@ -24,11 +24,13 @@ import java.util.Map;
 @RequestMapping("/api/cars")
 @Slf4j
 public class CarController {
-    @Autowired
-    private CarService carService;
+    private final CarService carService;
+    private final AuthService authService;
 
-    @Autowired
-    private AuthService authService;
+    public CarController(CarService carService, AuthService authService){
+        this.carService = carService;
+        this.authService = authService;
+    }
 
     @PostMapping()
     public ResponseEntity<Object> create(HttpServletRequest request, @Valid @RequestBody CarCreateDTO carCreateDTO){
