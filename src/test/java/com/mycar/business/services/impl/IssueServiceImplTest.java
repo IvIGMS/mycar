@@ -43,16 +43,16 @@ class IssueServiceImplTest {
     private IssueEntity issueEntityTime;
     private IssueEntity issueEntity;
     private CarEntity carEntity;
-    Page<IssueQueryDTO> issuesPage;
+    private Page<IssueQueryDTO> issuesPage;
     private Pageable pageable;
-    IssueQueryDTO issueQueryDTO;
-    IssueCreateDTO issueCreateDTODistance;
-    IssueCreateDTO issueCreateDTOTime;
-    TypeEntity typeEntityDistance;
-    TypeEntity typeEntityTime;
-    StatusEntity statusEntity;
+    private IssueQueryDTO issueQueryDTO;
+    private IssueCreateDTO issueCreateDTODistance;
+    private IssueCreateDTO issueCreateDTOTime;
+    private TypeEntity typeEntityDistance;
+    private TypeEntity typeEntityTime;
+    private StatusEntity statusEntity;
 
-    UserEntity userEntity;
+    private UserEntity userEntity;
 
     @BeforeEach
     public void setUp() {

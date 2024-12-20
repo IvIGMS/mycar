@@ -4,17 +4,12 @@ import com.mycar.business.controllers.dto.car.CarAddKm;
 import com.mycar.business.controllers.dto.car.CarCreateDTO;
 import com.mycar.business.controllers.dto.car.CarQueryDTO;
 import com.mycar.business.entities.UserEntity;
-import com.mycar.business.security.JwtAuthenticationFilter;
-import com.mycar.business.security.JwtUtils;
 import com.mycar.business.services.CarService;
 import com.mycar.business.services.impl.AuthService;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -68,8 +63,6 @@ class CarControllerTest {
     @MockBean
     private CarService carService;
 
-
-    private CarController carController;
     private UserEntity userEntity;
     private CarQueryDTO carQueryDTOOne;
     private CarQueryDTO carQueryDTOTwo;
