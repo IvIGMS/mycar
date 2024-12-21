@@ -138,7 +138,7 @@ class CarControllerTest {
     @Test
     void deactivateCar_ok() throws Exception {
         Map<String, String> map = new HashMap<>();
-        map.put("OK", "El vehículo con id 1 ha sido descativado correctamente");
+        map.put("OK", "El vehículo con id 1 ha sido desactivado correctamente");
 
         Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
         Mockito.when(carService.deactivateCar(Mockito.any(UserEntity.class), Mockito.any(Long.class))).thenReturn(map);
@@ -146,7 +146,7 @@ class CarControllerTest {
         mockMvc.perform(patch("/api/cars/deactivate/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.OK").value("El vehículo con id 1 ha sido descativado correctamente"));
+                .andExpect(jsonPath("$.OK").value("El vehículo con id 1 ha sido desactivado correctamente"));
     }
 
     @Test
@@ -209,5 +209,33 @@ class CarControllerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Ha habido un error al actualizar los km del vehículo"));
+    }
+
+    @Test
+    void activateCar_ok() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("OK", "El vehículo con id 1 ha sido activado correctamente");
+
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.activateCar(Mockito.any(UserEntity.class), Mockito.any(Long.class))).thenReturn(map);
+
+        mockMvc.perform(patch("/api/cars/activate/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.OK").value("El vehículo con id 1 ha sido activado correctamente"));
+    }
+
+    @Test
+    void activateCar_ko() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("KO", "El vehículo con id 1 no ha podido activarse.");
+
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.activateCar(Mockito.any(UserEntity.class), Mockito.any(Long.class))).thenReturn(map);
+
+        mockMvc.perform(patch("/api/cars/activate/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.KO").value("El vehículo con id 1 no ha podido activarse."));
     }
 }

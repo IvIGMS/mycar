@@ -15,6 +15,9 @@ public interface CarService {
     CarQueryDTO createCar(UserEntity user, CarCreateDTO carCreateDTO);
 
     Map<String, String> deactivateCar(UserEntity user, Long carId);
+
+    Map<String, String> activateCar(UserEntity user, Long carId);
+
     List<CarQueryDTO> getCars(Long userId);
 
     CarEntity getCarIfThisOwnerUser(Long userId, Long carId);
