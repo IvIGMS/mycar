@@ -45,4 +45,9 @@ public interface CarRepository extends JpaRepository<CarEntity, Long> {
             " WHERE C.id = ?2 " +
             " AND C.userEntity.id = ?1")
     Optional<CarEntity> findCarByCarIdAndUserId(Long userId, Long carId);
+
+    @Query("SELECT COUNT(C.id)" +
+            "FROM CarEntity C " +
+            "WHERE C.userEntity.id = ?1")
+    int numberOfCarsByUser(Long userId);
 }

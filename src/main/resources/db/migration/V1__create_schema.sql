@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- Tabla 'cars'
 CREATE TABLE IF NOT EXISTS cars (
     id SERIAL PRIMARY KEY,
-    company_name VARCHAR(50) NOT NULL UNIQUE,
-    model_name VARCHAR(50) NOT NULL UNIQUE,
+    company_name VARCHAR(50) NOT NULL,
+    model_name VARCHAR(50) NOT NULL,
     user_id INT NOT NULL,
     km INT NOT NULL,
     is_active BOOLEAN DEFAULT false,
