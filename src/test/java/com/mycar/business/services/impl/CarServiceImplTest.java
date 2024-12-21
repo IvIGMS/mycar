@@ -96,6 +96,21 @@ class CarServiceImplTest {
     }
 
     @Test
+    void createCar_ko_numberOfCarsGT5() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Seat")
+                .modelName("Leon")
+                .km(20000)
+                .build();
+
+        Mockito.when(carRepository.numberOfCarsByUser(Mockito.anyLong())).thenReturn(5);
+
+        CarQueryDTO results = carService.createCar(user, carCreateDTO);
+
+        assertNull(results);
+    }
+
+    @Test
     void deactivateCar_ok() {
         Mockito.when(carRepository.existsByUserIdAndCarIdAndIsActive(user.getId(), car1.getId())).thenReturn(true);
         Mockito.when(carRepository.deactivateCar(car1.getId())).thenReturn(1);

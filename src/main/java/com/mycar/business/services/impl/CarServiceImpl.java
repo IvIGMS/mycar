@@ -30,20 +30,29 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarQueryDTO createCar(UserEntity user, CarCreateDTO carCreateDTO) {
         CarEntity carSaved = null;
-        CarEntity car = CarEntity.builder()
-                .companyName(carCreateDTO.getCompanyName())
-                .modelName(carCreateDTO.getModelName())
-                .km(carCreateDTO.getKm())
-                .userEntity(user)
-                .isActive(true)
-                .build();
-        try{
-            carSaved = carRepository.save(car);
-            log.info("Vehículo guardado correctamente");
-        } catch (DataIntegrityViolationException e){
-            log.error("El vehículo no ha podido guardarse, tiene la llave duplicada");
+
+        if(isLessThanFiveCar(user)){
+            CarEntity car = CarEntity.builder()
+                    .companyName(carCreateDTO.getCompanyName())
+                    .modelName(carCreateDTO.getModelName())
+                    .km(carCreateDTO.getKm())
+                    .userEntity(user)
+                    .isActive(true)
+                    .build();
+            try{
+                carSaved = carRepository.save(car);
+                log.info("Vehículo guardado correctamente");
+            } catch (DataIntegrityViolationException e){
+                log.error("El vehículo no ha podido guardarse, tiene la llave duplicada");
+            }
+        } else {
+            log.error("El vehículo no ha podido guardarse, se ha llegado al máximo de 5 coches por usuario.");
         }
         return carCarQueryDTOMapper.carEntityToCarQueryDTO(carSaved);
+    }
+
+    private boolean isLessThanFiveCar(UserEntity user) {
+        return carRepository.numberOfCarsByUser(user.getId()) < 5;
     }
 
     @Override
