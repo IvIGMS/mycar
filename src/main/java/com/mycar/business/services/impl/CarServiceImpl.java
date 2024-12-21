@@ -58,10 +58,10 @@ public class CarServiceImpl implements CarService {
     @Override
     public Map<String, String> deactivateCar(UserEntity user, Long carId) {
         Map<String, String> results = new HashMap<>();;
-        if(existCarByUsername(user.getId(), carId)){
+        if(existCarByUsername(user.getId(), carId) && carRepository.isActive(carId)){
             Integer affectedRows = carRepository.deactivateCar(carId);
             if(affectedRows.equals(1)){
-                results.put("OK", "El vehículo con id " + carId + " ha sido descativado correctamente");
+                results.put("OK", "El vehículo con id " + carId + " ha sido desactivado correctamente");
             } else {
                 results.put("KO", "El vehículo con id " + carId + " no ha podido desactivarse.");
             }
@@ -70,6 +70,23 @@ public class CarServiceImpl implements CarService {
         }
         return results;
     }
+
+    @Override
+    public Map<String, String> activateCar(UserEntity user, Long carId) {
+        Map<String, String> results = new HashMap<>();;
+        if(existCarByUsername(user.getId(), carId) && !carRepository.isActive(carId)){
+            Integer affectedRows = carRepository.activateCar(carId);
+            if(affectedRows.equals(1)){
+                results.put("OK", "El vehículo con id " + carId + " ha sido activado correctamente");
+            } else {
+                results.put("KO", "El vehículo con id " + carId + " no ha podido activarse.");
+            }
+        } else {
+            results.put("KO", "El vehículo con id " + carId + " no ha podido activarse.");
+        }
+        return results;
+    }
+
 
     @Override
     public List<CarQueryDTO> getCars(Long userId) {
@@ -104,6 +121,10 @@ public class CarServiceImpl implements CarService {
     }
 
     private boolean existCarByUsername(Long userId, Long carId) {
-        return carRepository.existsByUserIdAndCarIdAndIsActive(userId, carId);
+        return carRepository.existsByUserIdAndCarId(userId, carId);
+    }
+
+    private boolean isActive(Long carId){
+        return carRepository.isActive(carId);
     }
 }

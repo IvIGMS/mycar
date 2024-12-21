@@ -62,6 +62,19 @@ public class CarController {
         }
     }
 
+    @Transactional
+    @PatchMapping("/activate/{carId}")
+    public ResponseEntity<Object> activateCar(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        Map<String, String> results = carService.activateCar(user, carId);
+
+        if(results.containsKey("OK")){
+            return ResponseEntity.ok(results);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(results);
+        }
+    }
+
     @GetMapping()
     public ResponseEntity<Object> getCars(HttpServletRequest request){
         UserEntity user = authService.getLoggedInUser(request);
