@@ -82,6 +82,17 @@ public class CarController {
         return ResponseEntity.ok(cars);
     }
 
+    @GetMapping("/{carId}")
+    public ResponseEntity<Object> getCarById(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.getCarById(user.getId(), carId);
+        if (car==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró el Issue con ID: " + carId + ". Es probable que pertenezca a otro usuario.");
+        }
+        return ResponseEntity.ok(car);
+    }
+
     @PatchMapping("/addKm")
     public ResponseEntity<Object> addKm(HttpServletRequest request, @Valid @RequestBody CarAddKm carAddKm){
         UserEntity user = authService.getLoggedInUser(request);

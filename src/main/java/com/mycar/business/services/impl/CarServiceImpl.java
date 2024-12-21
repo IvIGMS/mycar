@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -58,7 +59,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public Map<String, String> deactivateCar(UserEntity user, Long carId) {
         Map<String, String> results = new HashMap<>();;
-        if(existCarByUsername(user.getId(), carId) && carRepository.isActive(carId)){
+        if(existCarByUsername(user.getId(), carId) && isActive(carId)){
             Integer affectedRows = carRepository.deactivateCar(carId);
             if(affectedRows.equals(1)){
                 results.put("OK", "El vehículo con id " + carId + " ha sido desactivado correctamente");
@@ -74,7 +75,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public Map<String, String> activateCar(UserEntity user, Long carId) {
         Map<String, String> results = new HashMap<>();;
-        if(existCarByUsername(user.getId(), carId) && !carRepository.isActive(carId)){
+        if(existCarByUsername(user.getId(), carId) && !isActive(carId)){
             Integer affectedRows = carRepository.activateCar(carId);
             if(affectedRows.equals(1)){
                 results.put("OK", "El vehículo con id " + carId + " ha sido activado correctamente");
@@ -117,6 +118,15 @@ public class CarServiceImpl implements CarService {
             return null;
         }
         log.error("No han podido actualizarse los km del vehículo porque no existe o no pertenece a este usuario.");
+        return null;
+    }
+
+    @Override
+    public CarQueryDTO getCarById(Long userId, Long carId) {
+        if(existCarByUsername(userId, carId)){
+            Optional<CarEntity> car = carRepository.findById(carId);
+            return carCarQueryDTOMapper.carEntityToCarQueryDTO(car.orElse(null));
+        }
         return null;
     }
 
