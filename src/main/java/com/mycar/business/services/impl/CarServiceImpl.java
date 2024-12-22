@@ -130,6 +130,26 @@ public class CarServiceImpl implements CarService {
         return null;
     }
 
+    @Override
+    public CarQueryDTO deleteCarById(Long userId, Long carId) {
+        if(existCarByUsername(userId, carId)){
+            Optional<CarEntity> foundCar = carRepository.findById(carId);
+            if(foundCar.isPresent()){
+                carRepository.deleteById(carId);
+                Optional<CarEntity> foundCarAfterDelete = carRepository.findById(carId);
+                if(foundCarAfterDelete.isEmpty()){
+                    return carCarQueryDTOMapper.carEntityToCarQueryDTO(foundCar.get());
+                }
+                log.error("El vehículo no ha podido ser eliminado. Ha habido un error al eliminarlo en base de datos.");
+                return null;
+            }
+            log.error("El vehículo no ha podido ser eliminado. No ha sido encontrado con este id.");
+            return null;
+        }
+        log.error("El vehículo no ha podido ser eliminado. No existe o no exitste para este usuario.");
+        return null;
+    }
+
     private boolean existCarByUsername(Long userId, Long carId) {
         return carRepository.existsByUserIdAndCarId(userId, carId);
     }

@@ -330,6 +330,48 @@ class CarServiceImplTest {
 
         assertNull(results);
     }
+
+    @Test
+    void deleteCarById_ok(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity)).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertEquals(1L, results.getId());
+        assertEquals(20000, results.getKm());
+        assertEquals("Seat", results.getCompanyName());
+        assertEquals("Leon", results.getModelName());
+    }
+
+    @Test
+    void deleteCarById_koByExistCarByUsername(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void deleteCarById_koByNotFoundCar(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void deleteCarById_koByNotDeleteCar(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity)).thenReturn(Optional.of(carEntity));
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertNull(results);
+    }
 }
 
 

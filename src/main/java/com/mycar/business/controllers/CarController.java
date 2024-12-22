@@ -109,4 +109,15 @@ public class CarController {
             return ResponseEntity.badRequest().body("Ha habido un error al actualizar los km del vehículo");
         }
     }
+
+    @DeleteMapping("{carId}")
+    public ResponseEntity<Object> deleteCar(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.deleteCarById(user.getId(), carId);
+        if (car==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se ha podido eliminar el vehículo con ID: " + carId + ". Es probable que pertenezca a otro usuario.");
+        }
+        return ResponseEntity.ok(car);
+    }
 }

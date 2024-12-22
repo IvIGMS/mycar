@@ -106,10 +106,4 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Jhon"))
                 .andExpect(jsonPath("$.lastName").value("Doe"));
     }
-
-    @Disabled
-    @Test
-    void activateUser() throws Exception{
-
-    }
 }
