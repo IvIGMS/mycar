@@ -238,4 +238,31 @@ class CarControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.KO").value("El vehículo con id 1 no ha podido activarse."));
     }
+
+    @Test
+    void getCarById_ok() throws Exception{
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.getCarById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(carQueryDTOOne);
+
+        mockMvc.perform(get("/api/cars/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.companyName").value("Seat"))
+                .andExpect(jsonPath("$.modelName").value("Leon"))
+                .andExpect(jsonPath("$.km").value(20000));
+
+    }
+
+    @Test
+    void getCarById_ko() throws Exception{
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.getCarById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+
+        mockMvc.perform(get("/api/cars/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("No se encontró el Issue con ID: 1. Es probable que pertenezca a otro usuario."));
+
+    }
 }

@@ -298,6 +298,38 @@ class CarServiceImplTest {
 
         assertNull(results);
     }
+
+    @Test
+    void getCarById_ok(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity));
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertEquals(1L, results.getId());
+        assertEquals(20000, results.getKm());
+        assertEquals("Seat", results.getCompanyName());
+        assertEquals("Leon", results.getModelName());
+    }
+
+    @Test
+    void getCarById_koByExistsByUserIdAndCarId(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void getCarById_koByFindById(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertNull(results);
+    }
 }
 
 
