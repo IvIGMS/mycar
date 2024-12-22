@@ -138,6 +138,7 @@ public class CarServiceImpl implements CarService {
                 carRepository.deleteById(carId);
                 Optional<CarEntity> foundCarAfterDelete = carRepository.findById(carId);
                 if(foundCarAfterDelete.isEmpty()){
+                    log.info("El vehículo se ha eliminado correctamente.");
                     return carCarQueryDTOMapper.carEntityToCarQueryDTO(foundCar.get());
                 }
                 log.error("El vehículo no ha podido ser eliminado. Ha habido un error al eliminarlo en base de datos.");
