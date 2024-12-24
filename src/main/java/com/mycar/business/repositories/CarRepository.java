@@ -16,10 +16,9 @@ public interface CarRepository extends JpaRepository<CarEntity, Long> {
     @Query(" SELECT CASE WHEN COUNT(C) > 0 THEN true ELSE false END" +
             " FROM CarEntity C" +
             " WHERE C.userEntity.id = ?1 " +
-            " AND C.id = ?2" +
-            " AND C.isActive = true"
+            " AND C.id = ?2"
     )
-    boolean existsByUserIdAndCarIdAndIsActive(Long userId, Long issueId);
+    boolean existsByUserIdAndCarId(Long userId, Long issueId);
 
     @Transactional
     @Modifying
@@ -27,6 +26,13 @@ public interface CarRepository extends JpaRepository<CarEntity, Long> {
             " SET C.isActive = false " +
             " WHERE C.id = ?1")
     int deactivateCar(Long carId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE CarEntity C " +
+            " SET C.isActive = true " +
+            " WHERE C.id = ?1")
+    int activateCar(Long carId);
 
     @Query("SELECT new com.mycar.business.controllers.dto.car.CarQueryDTO(" +
             " C.id, " +
@@ -45,4 +51,14 @@ public interface CarRepository extends JpaRepository<CarEntity, Long> {
             " WHERE C.id = ?2 " +
             " AND C.userEntity.id = ?1")
     Optional<CarEntity> findCarByCarIdAndUserId(Long userId, Long carId);
+
+    @Query("SELECT COUNT(C.id)" +
+            "FROM CarEntity C " +
+            "WHERE C.userEntity.id = ?1")
+    int numberOfCarsByUser(Long userId);
+
+    @Query("SELECT C.isActive " +
+            "FROM CarEntity C " +
+            "WHERE C.id = ?1")
+    boolean isActive(Long carId);
 }

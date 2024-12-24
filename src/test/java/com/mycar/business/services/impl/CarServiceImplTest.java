@@ -96,20 +96,36 @@ class CarServiceImplTest {
     }
 
     @Test
+    void createCar_ko_numberOfCarsGT5() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Seat")
+                .modelName("Leon")
+                .km(20000)
+                .build();
+
+        Mockito.when(carRepository.numberOfCarsByUser(Mockito.anyLong())).thenReturn(5);
+
+        CarQueryDTO results = carService.createCar(user, carCreateDTO);
+
+        assertNull(results);
+    }
+
+    @Test
     void deactivateCar_ok() {
-        Mockito.when(carRepository.existsByUserIdAndCarIdAndIsActive(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
         Mockito.when(carRepository.deactivateCar(car1.getId())).thenReturn(1);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(true);
 
         Map<String, String> results = carService.deactivateCar(user, car1.getId());
 
         assertEquals(1, results.size());
         assertTrue(results.containsKey("OK"));
-        assertEquals("El vehículo con id 1 ha sido descativado correctamente", results.get("OK"));
+        assertEquals("El vehículo con id 1 ha sido desactivado correctamente", results.get("OK"));
     }
 
     @Test
     void deactivateCar_koByExistCarByUsername() {
-        Mockito.when(carRepository.existsByUserIdAndCarIdAndIsActive(user.getId(), car1.getId())).thenReturn(false);
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(false);
 
         Map<String, String> results = carService.deactivateCar(user, car1.getId());
 
@@ -119,8 +135,32 @@ class CarServiceImplTest {
     }
 
     @Test
-    void deactivateCar_koByAffectedRows() {
-        Mockito.when(carRepository.existsByUserIdAndCarIdAndIsActive(user.getId(), car1.getId())).thenReturn(true);
+    void deactivateCar_koIsActiveEqualsFalse() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(false);
+
+        Map<String, String> results = carService.deactivateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido desactivarse.", results.get("KO"));
+    }
+
+    @Test
+    void deactivateCar_koExistsByUserIdAndCarIdFalse() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(false);
+
+        Map<String, String> results = carService.deactivateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido desactivarse.", results.get("KO"));
+    }
+
+    @Test
+    void deactivateCar_koByDeactivateCarRowsEqualsZero() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(true);
         Mockito.when(carRepository.deactivateCar(car1.getId())).thenReturn(0);
 
         Map<String, String> results = carService.deactivateCar(user, car1.getId());
@@ -128,6 +168,66 @@ class CarServiceImplTest {
         assertEquals(1, results.size());
         assertTrue(results.containsKey("KO"));
         assertEquals("El vehículo con id 1 no ha podido desactivarse.", results.get("KO"));
+    }
+
+    @Test
+    void activateCar_ok() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.activateCar(car1.getId())).thenReturn(1);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(false);
+
+        Map<String, String> results = carService.activateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("OK"));
+        assertEquals("El vehículo con id 1 ha sido activado correctamente", results.get("OK"));
+    }
+
+    @Test
+    void activateCar_koByExistCarByUsername() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(false);
+
+        Map<String, String> results = carService.activateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido activarse.", results.get("KO"));
+    }
+
+    @Test
+    void activateCar_koIsActiveEqualsFalse() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(true);
+
+        Map<String, String> results = carService.activateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido activarse.", results.get("KO"));
+    }
+
+    @Test
+    void activateCar_koExistsByUserIdAndCarIdFalse() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(false);
+
+        Map<String, String> results = carService.activateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido activarse.", results.get("KO"));
+    }
+
+    @Test
+    void activateCar_koByDeactivateCarRowsEqualsZero() {
+        Mockito.when(carRepository.existsByUserIdAndCarId(user.getId(), car1.getId())).thenReturn(true);
+        Mockito.when(carRepository.isActive(Mockito.anyLong())).thenReturn(false);
+        Mockito.when(carRepository.activateCar(car1.getId())).thenReturn(0);
+
+        Map<String, String> results = carService.activateCar(user, car1.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.containsKey("KO"));
+        assertEquals("El vehículo con id 1 no ha podido activarse.", results.get("KO"));
     }
 
     @Test
@@ -195,6 +295,80 @@ class CarServiceImplTest {
         Mockito.when(carRepository.findCarByCarIdAndUserId(user.getId(), carEntity.getId())).thenReturn(Optional.of(carEntity));
         carAddKm.setKm(20000);
         CarQueryDTO results = carService.addKm(user, carAddKm);
+
+        assertNull(results);
+    }
+
+    @Test
+    void getCarById_ok(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity));
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertEquals(1L, results.getId());
+        assertEquals(20000, results.getKm());
+        assertEquals("Seat", results.getCompanyName());
+        assertEquals("Leon", results.getModelName());
+    }
+
+    @Test
+    void getCarById_koByExistsByUserIdAndCarId(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void getCarById_koByFindById(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.getCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void deleteCarById_ok(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity)).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertEquals(1L, results.getId());
+        assertEquals(20000, results.getKm());
+        assertEquals("Seat", results.getCompanyName());
+        assertEquals("Leon", results.getModelName());
+    }
+
+    @Test
+    void deleteCarById_koByExistCarByUsername(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void deleteCarById_koByNotFoundCar(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void deleteCarById_koByNotDeleteCar(){
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity)).thenReturn(Optional.of(carEntity));
+
+        CarQueryDTO results = carService.deleteCarById(1L, 1L);
 
         assertNull(results);
     }

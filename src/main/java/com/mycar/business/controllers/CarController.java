@@ -24,11 +24,13 @@ import java.util.Map;
 @RequestMapping("/api/cars")
 @Slf4j
 public class CarController {
-    @Autowired
-    private CarService carService;
+    private final CarService carService;
+    private final AuthService authService;
 
-    @Autowired
-    private AuthService authService;
+    public CarController(CarService carService, AuthService authService){
+        this.carService = carService;
+        this.authService = authService;
+    }
 
     @PostMapping()
     public ResponseEntity<Object> create(HttpServletRequest request, @Valid @RequestBody CarCreateDTO carCreateDTO){
@@ -60,11 +62,35 @@ public class CarController {
         }
     }
 
+    @Transactional
+    @PatchMapping("/activate/{carId}")
+    public ResponseEntity<Object> activateCar(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        Map<String, String> results = carService.activateCar(user, carId);
+
+        if(results.containsKey("OK")){
+            return ResponseEntity.ok(results);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(results);
+        }
+    }
+
     @GetMapping()
     public ResponseEntity<Object> getCars(HttpServletRequest request){
         UserEntity user = authService.getLoggedInUser(request);
         List<CarQueryDTO> cars = carService.getCars(user.getId());
         return ResponseEntity.ok(cars);
+    }
+
+    @GetMapping("/{carId}")
+    public ResponseEntity<Object> getCarById(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.getCarById(user.getId(), carId);
+        if (car==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró el Issue con ID: " + carId + ". Es probable que pertenezca a otro usuario.");
+        }
+        return ResponseEntity.ok(car);
     }
 
     @PatchMapping("/addKm")
@@ -82,5 +108,16 @@ public class CarController {
         } else {
             return ResponseEntity.badRequest().body("Ha habido un error al actualizar los km del vehículo");
         }
+    }
+
+    @DeleteMapping("{carId}")
+    public ResponseEntity<Object> deleteCar(HttpServletRequest request, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.deleteCarById(user.getId(), carId);
+        if (car==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se ha podido eliminar el vehículo con ID: " + carId + ". Es probable que pertenezca a otro usuario.");
+        }
+        return ResponseEntity.ok(car);
     }
 }

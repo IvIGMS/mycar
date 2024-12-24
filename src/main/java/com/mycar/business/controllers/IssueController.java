@@ -23,14 +23,15 @@ import java.net.URI;
 @RequestMapping("/api/issues")
 @Slf4j
 public class IssueController {
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final IssueService issueService;
+    private final ControllerHelper controllerHelper;
 
-    @Autowired
-    private IssueService issueService;
-
-    @Autowired
-    private ControllerHelper controllerHelper;
+    public IssueController(AuthService authService, IssueService issueService, ControllerHelper controllerHelper){
+        this.authService = authService;
+        this.issueService = issueService;
+        this.controllerHelper = controllerHelper;
+    }
 
     @GetMapping()
     public ResponseEntity<Page<IssueQueryDTO>> getIssues(HttpServletRequest request){
@@ -70,19 +71,3 @@ public class IssueController {
         return ResponseEntity.ok(issue);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

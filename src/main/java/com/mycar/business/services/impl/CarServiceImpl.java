@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,29 +31,38 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarQueryDTO createCar(UserEntity user, CarCreateDTO carCreateDTO) {
         CarEntity carSaved = null;
-        CarEntity car = CarEntity.builder()
-                .companyName(carCreateDTO.getCompanyName())
-                .modelName(carCreateDTO.getModelName())
-                .km(carCreateDTO.getKm())
-                .userEntity(user)
-                .isActive(true)
-                .build();
-        try{
-            carSaved = carRepository.save(car);
-            log.info("Vehículo guardado correctamente");
-        } catch (DataIntegrityViolationException e){
-            log.error("El vehículo no ha podido guardarse, tiene la llave duplicada");
+
+        if(isLessThanFiveCar(user)){
+            CarEntity car = CarEntity.builder()
+                    .companyName(carCreateDTO.getCompanyName())
+                    .modelName(carCreateDTO.getModelName())
+                    .km(carCreateDTO.getKm())
+                    .userEntity(user)
+                    .isActive(true)
+                    .build();
+            try{
+                carSaved = carRepository.save(car);
+                log.info("Vehículo guardado correctamente");
+            } catch (DataIntegrityViolationException e){
+                log.error("El vehículo no ha podido guardarse, tiene la llave duplicada");
+            }
+        } else {
+            log.error("El vehículo no ha podido guardarse, se ha llegado al máximo de 5 coches por usuario.");
         }
         return carCarQueryDTOMapper.carEntityToCarQueryDTO(carSaved);
+    }
+
+    private boolean isLessThanFiveCar(UserEntity user) {
+        return carRepository.numberOfCarsByUser(user.getId()) < 5;
     }
 
     @Override
     public Map<String, String> deactivateCar(UserEntity user, Long carId) {
         Map<String, String> results = new HashMap<>();;
-        if(existCarByUsername(user.getId(), carId)){
+        if(existCarByUsername(user.getId(), carId) && isActive(carId)){
             Integer affectedRows = carRepository.deactivateCar(carId);
             if(affectedRows.equals(1)){
-                results.put("OK", "El vehículo con id " + carId + " ha sido descativado correctamente");
+                results.put("OK", "El vehículo con id " + carId + " ha sido desactivado correctamente");
             } else {
                 results.put("KO", "El vehículo con id " + carId + " no ha podido desactivarse.");
             }
@@ -61,6 +71,23 @@ public class CarServiceImpl implements CarService {
         }
         return results;
     }
+
+    @Override
+    public Map<String, String> activateCar(UserEntity user, Long carId) {
+        Map<String, String> results = new HashMap<>();;
+        if(existCarByUsername(user.getId(), carId) && !isActive(carId)){
+            Integer affectedRows = carRepository.activateCar(carId);
+            if(affectedRows.equals(1)){
+                results.put("OK", "El vehículo con id " + carId + " ha sido activado correctamente");
+            } else {
+                results.put("KO", "El vehículo con id " + carId + " no ha podido activarse.");
+            }
+        } else {
+            results.put("KO", "El vehículo con id " + carId + " no ha podido activarse.");
+        }
+        return results;
+    }
+
 
     @Override
     public List<CarQueryDTO> getCars(Long userId) {
@@ -94,7 +121,41 @@ public class CarServiceImpl implements CarService {
         return null;
     }
 
+    @Override
+    public CarQueryDTO getCarById(Long userId, Long carId) {
+        if(existCarByUsername(userId, carId)){
+            Optional<CarEntity> car = carRepository.findById(carId);
+            return carCarQueryDTOMapper.carEntityToCarQueryDTO(car.orElse(null));
+        }
+        return null;
+    }
+
+    @Override
+    public CarQueryDTO deleteCarById(Long userId, Long carId) {
+        if(existCarByUsername(userId, carId)){
+            Optional<CarEntity> foundCar = carRepository.findById(carId);
+            if(foundCar.isPresent()){
+                carRepository.deleteById(carId);
+                Optional<CarEntity> foundCarAfterDelete = carRepository.findById(carId);
+                if(foundCarAfterDelete.isEmpty()){
+                    log.info("El vehículo se ha eliminado correctamente.");
+                    return carCarQueryDTOMapper.carEntityToCarQueryDTO(foundCar.get());
+                }
+                log.error("El vehículo no ha podido ser eliminado. Ha habido un error al eliminarlo en base de datos.");
+                return null;
+            }
+            log.error("El vehículo no ha podido ser eliminado. No ha sido encontrado con este id.");
+            return null;
+        }
+        log.error("El vehículo no ha podido ser eliminado. No existe o no exitste para este usuario.");
+        return null;
+    }
+
     private boolean existCarByUsername(Long userId, Long carId) {
-        return carRepository.existsByUserIdAndCarIdAndIsActive(userId, carId);
+        return carRepository.existsByUserIdAndCarId(userId, carId);
+    }
+
+    private boolean isActive(Long carId){
+        return carRepository.isActive(carId);
     }
 }

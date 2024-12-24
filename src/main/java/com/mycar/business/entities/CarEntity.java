@@ -19,10 +19,10 @@ public class CarEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50, name = "company_name")
+    @Column(nullable = false, length = 50, name = "company_name")
     private String companyName;
 
-    @Column(nullable = false, unique = true, length = 50, name = "model_name")
+    @Column(nullable = false, length = 50, name = "model_name")
     private String modelName;
 
     // Relación con la tabla 'User'
