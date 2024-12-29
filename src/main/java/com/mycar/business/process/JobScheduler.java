@@ -15,7 +15,7 @@ public class JobScheduler {
     private final JobLauncher jobLauncher;
     private final Job updateIssuesByDateProcessJob;
 
-    public JobScheduler(JobLauncher jobLauncher, @Qualifier("updateIssuesByDateProcess") Job updateIssuesByDateProcessJob) {
+    public JobScheduler(JobLauncher jobLauncher, @Qualifier("process") Job updateIssuesByDateProcessJob) {
         this.jobLauncher = jobLauncher;
         this.updateIssuesByDateProcessJob = updateIssuesByDateProcessJob;
     }

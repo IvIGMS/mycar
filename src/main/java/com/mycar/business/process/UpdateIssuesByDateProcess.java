@@ -1,11 +1,14 @@
 package com.mycar.business.process;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.NotificationEntity;
 import com.mycar.business.entities.StatusEntity;
 import com.mycar.business.repositories.IssueRepository;
 import com.mycar.business.repositories.NotificationRepository;
 import com.mycar.business.services.NotificationTypeService;
+import com.mycar.business.services.impl.KafkaProducerServiceImpl;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -37,6 +40,12 @@ public class UpdateIssuesByDateProcess {
     @Autowired
     private NotificationTypeService notificationTypeService;
 
+    @Autowired
+    private KafkaProducerServiceImpl kafkaProducerService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
@@ -45,7 +54,7 @@ public class UpdateIssuesByDateProcess {
         this.transactionManager = transactionManager;
     }
 
-    @Bean(name = "updateIssuesByDateProcess")
+    @Bean(name = "process")
     public Job updateIssuesJob() {
         return new JobBuilder("updateIssuesJob", jobRepository)
                 .start(updateIssues())
@@ -98,7 +107,16 @@ public class UpdateIssuesByDateProcess {
                     ).toList();
 
                     notificationRepository.saveAll(notifications);
-                    // Falta un send notifications con una cola de kafka
+
+                    // Send notification
+                    notifications.forEach(n -> {
+                        try {
+                            kafkaProducerService.sendMessage(objectMapper.writeValueAsString(n));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
                     return null;
                 }, transactionManager)
                 .build();
