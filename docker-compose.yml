@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    container_name: postgres-db
+    container_name: postgres-db-business
     ports:
       - "5433:5432"
     environment:

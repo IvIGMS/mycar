@@ -2,7 +2,7 @@ spring:
   application:
     name: business
   server:
-    port: 8081
+    port: ${SERVER_PORT}}
   sql:
     init:
       mode: never

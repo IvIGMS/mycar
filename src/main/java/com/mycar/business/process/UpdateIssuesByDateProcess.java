@@ -2,11 +2,14 @@ package com.mycar.business.process;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycar.business.controllers.constants.NotificationTypeConstants;
 import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.NotificationEntity;
 import com.mycar.business.entities.StatusEntity;
 import com.mycar.business.repositories.IssueRepository;
 import com.mycar.business.repositories.NotificationRepository;
+import com.mycar.business.services.IssueService;
+import com.mycar.business.services.NotificationService;
 import com.mycar.business.services.NotificationTypeService;
 import com.mycar.business.services.impl.KafkaProducerServiceImpl;
 import jakarta.persistence.EntityManagerFactory;
@@ -27,24 +30,14 @@ import java.util.List;
 @Configuration
 @EnableBatchProcessing
 public class UpdateIssuesByDateProcess {
-
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    private IssueRepository issueRepository;
+    private IssueService issueService;
 
     @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private NotificationTypeService notificationTypeService;
-
-    @Autowired
-    private KafkaProducerServiceImpl kafkaProducerService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private NotificationService notificationService;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -66,20 +59,13 @@ public class UpdateIssuesByDateProcess {
     public Step updateIssues() {
         return new StepBuilder("updateIssues", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    List<IssueEntity> issues = issueRepository.getIssuesByExpiredDate(
-                            LocalDate.now().atStartOfDay(),
-                            LocalDate.now().plusDays(1).atStartOfDay()
-                    );
+
+                    List<Long> issuesId = issueService.updateIssuesExpiredByDate();
 
                     chunkContext.getStepContext().getStepExecution()
                             .getJobExecution()
                             .getExecutionContext()
-                            .put("issues", issues.stream().map(IssueEntity::getId).toList());
-
-                    issues.forEach(issue -> {
-                        issue.setStatusEntity(StatusEntity.builder().id(0L).statusName("status.finish").build());
-                        issueRepository.save(issue);
-                    });
+                            .put("issues", issuesId);
 
                     return null;
                 }, transactionManager)
@@ -90,31 +76,20 @@ public class UpdateIssuesByDateProcess {
     public Step createNotifications() {
         return new StepBuilder("createNotifications", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    List<Long> issues = (List<Long>) chunkContext.getStepContext().getStepExecution()
+                    List<Long> issuesId = (List<Long>) chunkContext.getStepContext().getStepExecution()
                             .getJobExecution()
                             .getExecutionContext()
                             .get("issues");
 
-                    List<IssueEntity> allIssues = issueRepository.getIssuesByIds(issues);
+                    // Create notifications
+                    List<NotificationEntity> notifications = notificationService.createNotifications(
+                            issuesId,
+                            NotificationTypeConstants.NT_ISSUE_BY_DATE_ID
+                    );
 
-                    List<NotificationEntity> notifications = allIssues.stream().map(issue -> NotificationEntity.builder()
-                                .header("Notificación de mantenimiento vencido")
-                                .message("El mantenimiento " + issue.getName() + " ha vencido.")
-                                .sender("admin@mycar.com")
-                                .receiver(issue.getCarEntity().getUserEntity().getEmail())
-                                .notificationTypeEntity(notificationTypeService.findById(101L))
-                                .build()
-                    ).toList();
-
-                    notificationRepository.saveAll(notifications);
-
-                    // Send notification
+                    // Send notifications
                     notifications.forEach(n -> {
-                        try {
-                            kafkaProducerService.sendMessage(objectMapper.writeValueAsString(n));
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
+                        notificationService.sendNotification(n);
                     });
 
                     return null;
