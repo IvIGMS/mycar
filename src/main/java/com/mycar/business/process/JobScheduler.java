@@ -20,7 +20,7 @@ public class JobScheduler {
         this.updateIssuesByDateProcessJob = updateIssuesByDateProcessJob;
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 21 * * ?")
     public void scheduleJob() {
         try {
             jobLauncher.run(updateIssuesByDateProcessJob, new JobParametersBuilder().addLong("time", System.currentTimeMillis()).toJobParameters());

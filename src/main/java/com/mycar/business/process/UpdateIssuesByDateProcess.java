@@ -1,17 +1,9 @@
 package com.mycar.business.process;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycar.business.controllers.constants.NotificationTypeConstants;
-import com.mycar.business.entities.IssueEntity;
 import com.mycar.business.entities.NotificationEntity;
-import com.mycar.business.entities.StatusEntity;
-import com.mycar.business.repositories.IssueRepository;
-import com.mycar.business.repositories.NotificationRepository;
 import com.mycar.business.services.IssueService;
 import com.mycar.business.services.NotificationService;
-import com.mycar.business.services.NotificationTypeService;
-import com.mycar.business.services.impl.KafkaProducerServiceImpl;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -24,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
