@@ -122,7 +122,7 @@ public class CarController {
     }
 
     @PutMapping("/{carId}")
-    public ResponseEntity<Object> update(HttpServletRequest request, @Valid @RequestBody CarCreateDTO carCreateDTO, @PathVariable("carId") Long carId){
+    public ResponseEntity<Object> updateCar(HttpServletRequest request, @Valid @RequestBody CarCreateDTO carCreateDTO, @PathVariable("carId") Long carId){
         UserEntity user = authService.getLoggedInUser(request);
         CarQueryDTO car = carService.updateCar(user, carCreateDTO, carId);
 
