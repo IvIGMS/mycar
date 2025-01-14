@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface IssueRepository extends JpaRepository<IssueEntity, Long> {
     @Query("SELECT new com.mycar.business.controllers.dto.issue.IssueQueryDTO(" +
@@ -38,4 +41,14 @@ public interface IssueRepository extends JpaRepository<IssueEntity, Long> {
             " JOIN CarEntity C ON I.carEntity.id = C.id " +
             " WHERE C.userEntity.id = ?1 AND I.id = ?2")
     boolean existIssueByUsername(Long userId, Long issueId);
+
+    @Query("SELECT i " +
+            " FROM IssueEntity i " +
+            " WHERE i.notificationDate BETWEEN :startDate " +
+            " AND :endDate " +
+            " AND i.statusEntity.id = 1")
+    List<IssueEntity> getIssuesByExpiredDate(LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query("SELECT i FROM IssueEntity i WHERE i.id IN (:ids) ")
+    List<IssueEntity> getIssuesByIds(List<Long> ids);
 }

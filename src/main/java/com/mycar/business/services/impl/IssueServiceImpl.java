@@ -5,6 +5,7 @@ import com.mycar.business.controllers.dto.issue.IssueQueryDTO;
 import com.mycar.business.controllers.mappers.IssueIssueQueryDTOMapper;
 import com.mycar.business.entities.CarEntity;
 import com.mycar.business.entities.IssueEntity;
+import com.mycar.business.entities.StatusEntity;
 import com.mycar.business.entities.UserEntity;
 import com.mycar.business.repositories.IssueRepository;
 import com.mycar.business.services.*;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -97,6 +100,26 @@ public class IssueServiceImpl implements IssueService {
             return issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issue.orElse(null));
         }
         return null;
+    }
+
+    @Override
+    public List<IssueEntity> getIssuesByIds(List<Long> issues) {
+        return issueRepository.getIssuesByIds(issues);
+    }
+
+    @Override
+    public List<Long> updateIssuesExpiredByDate() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
+
+        List<IssueEntity> issues = issueRepository.getIssuesByExpiredDate(start, end);
+
+        issues.forEach(issue -> {
+            issue.setStatusEntity(StatusEntity.builder().id(0L).statusName("status.finish").build());
+            issueRepository.save(issue);
+        });
+
+        return issues.stream().map(IssueEntity::getId).toList();
     }
 
     private boolean existIssueByUsername(Long userId, Long issueId) {

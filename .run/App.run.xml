@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="App" type="Application" factoryName="Application">
+    <envs>
+      <env name="KAFKA_TOPIC_NAME" value="B2N-topic" />
+      <env name="KAFKA_URL" value="localhost:9092" />
+      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+      <env name="SERVER_PORT" value="8081" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.mycar.business.BusinessApplication" />
+    <module name="business" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

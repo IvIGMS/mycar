@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ class IssueServiceImplTest {
     private TypeEntity typeEntityDistance;
     private TypeEntity typeEntityTime;
     private StatusEntity statusEntity;
-
+    private List<IssueEntity> issueEntityList;
     private UserEntity userEntity;
 
     @BeforeEach
@@ -69,6 +70,8 @@ class IssueServiceImplTest {
 
         List<IssueQueryDTO> issueQueryDTOS = new ArrayList<IssueQueryDTO>();
         issueQueryDTOS.add(issueQueryDTO);
+
+        issueEntityList = Arrays.asList(issueEntity, issueEntityDistance, issueEntityTime);
 
         issuesPage = new PageImpl<>(issueQueryDTOS, pageable, 1);
 
@@ -188,5 +191,25 @@ class IssueServiceImplTest {
         Mockito.when(issueRepository.existIssueByUsername(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
         IssueQueryDTO results = issueService.getIssueById(1L, 1L);
         assertNull(results);
+    }
+
+    @Test
+    void getIssuesById_ok() {
+        Mockito.when(issueRepository.getIssuesByIds(Mockito.any())).thenReturn(issueEntityList);
+        List<IssueEntity> results = issueService.getIssuesByIds(Arrays.asList(1L,2L,3L));
+        assertEquals("Cambio de ruedas", results.get(0).getName());
+        assertEquals("Revisar pastillas de freno", results.get(1).getName());
+        assertEquals("Revisar nivel de carburante", results.get(2).getName());
+        assertEquals("Leon", results.get(0).getCarEntity().getModelName());
+    }
+
+    @Test
+    void updateIssuesExpiredByDate() {
+        Mockito.when(issueRepository.getIssuesByExpiredDate(Mockito.any(), Mockito.any())).thenReturn(issueEntityList);
+        List<Long> idList = issueService.updateIssuesExpiredByDate();
+        assertNotNull(idList);
+        assertEquals(1, idList.get(0));
+        assertEquals(1, idList.get(1));
+        assertEquals(2, idList.get(2));
     }
 }

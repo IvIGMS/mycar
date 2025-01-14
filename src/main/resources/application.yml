@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: business
+  server:
+    port: ${SERVER_PORT}}
+  sql:
+    init:
+      mode: never
+      schema-locations: classpath:org/springframework/batch/core/schema-postgresql.sql
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+
+logging:
+  level:
+    org:
+      flywaydb:
+        core: DEBUG
+
+jwt:
+  secret: htD77GpfmD37m7bqYcSw339j4U/F/MbrHhcHepUlN98xE8bR5h0qtgbftMRkTy3Y3qe+dH4joxEva03k4aU64w==
+  expirationMs: 36000000
+
+KAFKA_TOPIC_NAME: ${KAFKA_TOPIC_NAME}
