@@ -372,6 +372,87 @@ class CarServiceImplTest {
 
         assertNull(results);
     }
+
+    @Test
+    void updateCar_ok() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Toyota")
+                .modelName("Rav4")
+                .km(30000)
+                .build();
+
+        CarEntity carEntitySave = CarEntity.builder()
+                .companyName("Toyota")
+                .modelName("Rav4")
+                .km(30000)
+                .build();
+
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity));
+        Mockito.when(carRepository.save(Mockito.any(CarEntity.class))).thenReturn(carEntitySave);
+
+        CarQueryDTO results = carService.updateCar(user, carCreateDTO, 1L);
+
+        assertNotNull(results);
+        assertEquals("Toyota", results.getCompanyName());
+        assertEquals("Rav4", results.getModelName());
+        assertEquals(30000, results.getKm());
+    }
+
+    @Test
+    void updateCar_ko_isTheSame() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Seat")
+                .modelName("Leon")
+                .km(20000)
+                .build();
+
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity));
+
+        CarQueryDTO results = carService.updateCar(user, carCreateDTO, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void updateCar_ko_notExistByUsername() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Seat")
+                .modelName("Leon")
+                .km(20000)
+                .build();
+
+
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        CarQueryDTO results = carService.updateCar(user, carCreateDTO, 1L);
+
+        assertNull(results);
+    }
+
+    @Test
+    void updateCar_kop_dataIntegrityViolationException() {
+        CarCreateDTO carCreateDTO = CarCreateDTO.builder()
+                .companyName("Toyota")
+                .modelName("Rav4")
+                .km(30000)
+                .build();
+
+        CarEntity carEntitySave = CarEntity.builder()
+                .companyName("Toyota")
+                .modelName("Rav4")
+                .km(30000)
+                .build();
+
+        Mockito.when(carRepository.existsByUserIdAndCarId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(true);
+        Mockito.when(carRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(carEntity));
+        Mockito.when(carRepository.save(Mockito.any(CarEntity.class))).thenThrow(new DataIntegrityViolationException("Error en el save"));
+
+        CarQueryDTO results = carService.updateCar(user, carCreateDTO, 1L);
+
+        assertNull(results);
+    }
 }
 
 

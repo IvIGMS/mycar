@@ -290,4 +290,43 @@ class CarControllerTest {
                 .andExpect(content().string("No se ha podido eliminar el vehículo con ID: 1. Es probable que pertenezca a otro usuario."));
 
     }
+
+    @Test
+    void updateCar_ok() throws Exception {
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.updateCar(Mockito.any(UserEntity.class), Mockito.any(CarCreateDTO.class), Mockito.anyLong())).thenReturn(carQueryDTOOne);
+
+        mockMvc.perform(put("/api/cars/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "companyName": "Seat",
+                                    "modelName": "Leon",
+                                    "km": 20000
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.companyName").value("Seat"))
+                .andExpect(jsonPath("$.modelName").value("Leon"))
+                .andExpect(jsonPath("$.km").value(20000));
+    }
+
+    @Test
+    void updateCar_ko() throws Exception {
+        Mockito.when(authService.getLoggedInUser(Mockito.any())).thenReturn(userEntity);
+        Mockito.when(carService.updateCar(Mockito.any(UserEntity.class), Mockito.any(CarCreateDTO.class), Mockito.anyLong())).thenReturn(null);
+
+        mockMvc.perform(put("/api/cars/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "companyName": "Seat",
+                                    "modelName": "Leon",
+                                    "km": 20000
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Ha habido un error al actualizar el vehículo en la base de datos"));
+    }
 }
