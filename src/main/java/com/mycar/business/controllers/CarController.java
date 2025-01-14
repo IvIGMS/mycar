@@ -110,7 +110,7 @@ public class CarController {
         }
     }
 
-    @DeleteMapping("{carId}")
+    @DeleteMapping("/{carId}")
     public ResponseEntity<Object> deleteCar(HttpServletRequest request, @PathVariable("carId") Long carId){
         UserEntity user = authService.getLoggedInUser(request);
         CarQueryDTO car = carService.deleteCarById(user.getId(), carId);
@@ -119,5 +119,22 @@ public class CarController {
                     .body("No se ha podido eliminar el vehículo con ID: " + carId + ". Es probable que pertenezca a otro usuario.");
         }
         return ResponseEntity.ok(car);
+    }
+
+    @PutMapping("/{carId}")
+    public ResponseEntity<Object> update(HttpServletRequest request, @Valid @RequestBody CarCreateDTO carCreateDTO, @PathVariable("carId") Long carId){
+        UserEntity user = authService.getLoggedInUser(request);
+        CarQueryDTO car = carService.updateCar(user, carCreateDTO, carId);
+
+        if (car!=null){
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(car.getId())
+                    .toUri();
+            return ResponseEntity.created(location).body(car);
+        } else {
+            return ResponseEntity.badRequest().body("Ha habido un error al actualizar el vehículo en la base de datos");
+        }
     }
 }

@@ -151,6 +151,41 @@ public class CarServiceImpl implements CarService {
         return null;
     }
 
+    @Override
+    public CarQueryDTO updateCar(UserEntity user, CarCreateDTO carCreateDTO, Long carId) {
+        CarQueryDTO carUpdated = null;
+
+        if(existCarByUsername(user.getId(), carId)){
+            Optional<CarEntity> optionalCurrentCar = carRepository.findById(carId);
+            if(optionalCurrentCar.isPresent() && !isTheSame(carCreateDTO, optionalCurrentCar.get())){
+                CarEntity currentCar = optionalCurrentCar.get();
+                currentCar.setCompanyName(carCreateDTO.getCompanyName());
+                currentCar.setModelName(carCreateDTO.getModelName());
+                currentCar.setKm(carCreateDTO.getKm());
+
+                try{
+                    CarEntity carEntityUpdated = carRepository.save(currentCar);
+                    carUpdated = carCarQueryDTOMapper.carEntityToCarQueryDTO(carEntityUpdated);
+                    log.info("Vehículo actualizado correctamente");
+                } catch (DataIntegrityViolationException e){
+                    log.error("El vehículo no ha podido guardarse, error en la base de datos");
+                }
+            } else {
+                log.error("El vehículo introducido no ha experimentado ningún frente al actual");
+            }
+        } else {
+            log.error("El vehículo introducido no existe para este usuario");
+        }
+        return carUpdated;
+    }
+
+    private boolean isTheSame(CarCreateDTO carCreateDTO, CarEntity carEntity) {
+        return carCreateDTO.getKm().equals(carEntity.getKm())
+                && carCreateDTO.getCompanyName().equals(carEntity.getCompanyName())
+                && carCreateDTO.getModelName().equals(carEntity.getModelName());
+    }
+
+
     private boolean existCarByUsername(Long userId, Long carId) {
         return carRepository.existsByUserIdAndCarId(userId, carId);
     }

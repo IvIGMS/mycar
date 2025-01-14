@@ -27,4 +27,6 @@ public interface CarService {
     CarQueryDTO getCarById(Long id, Long carId);
 
     CarQueryDTO deleteCarById(Long userId, Long carId);
+
+    CarQueryDTO updateCar(UserEntity user, CarCreateDTO carCreateDTO, Long carId);
 }
