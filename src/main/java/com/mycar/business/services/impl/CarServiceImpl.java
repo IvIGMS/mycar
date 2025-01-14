@@ -171,7 +171,7 @@ public class CarServiceImpl implements CarService {
                     log.error("El vehículo no ha podido guardarse, error en la base de datos");
                 }
             } else {
-                log.error("El vehículo introducido no ha experimentado ningún frente al actual");
+                log.error("El vehículo introducido no ha experimentado ningún cambio frente al actual");
             }
         } else {
             log.error("El vehículo introducido no existe para este usuario");
