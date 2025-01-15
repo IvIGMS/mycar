@@ -168,7 +168,7 @@ class IssueControllerTest {
     @Test
     void deleteIssue_ok() throws Exception{
         Mockito.when(authService.getLoggedInUser(Mockito.any(HttpServletRequest.class))).thenReturn(userEntity);
-        Mockito.when(issueService.deleteIssueById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+        Mockito.when(issueService.deleteIssueById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(issueQueryDTO);
 
         mockMvc.perform(delete("/api/issues/1")
                         .contentType(MediaType.APPLICATION_JSON))
