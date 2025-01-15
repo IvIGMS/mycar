@@ -22,12 +22,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -165,5 +163,29 @@ class IssueControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No se encontró el Issue con ID: 1. Es probable que pertenezca a otro usuario."));
+    }
+
+    @Test
+    void deleteIssue_ok() throws Exception{
+        Mockito.when(authService.getLoggedInUser(Mockito.any(HttpServletRequest.class))).thenReturn(userEntity);
+        Mockito.when(issueService.deleteIssueById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+
+        mockMvc.perform(delete("/api/issues/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Cambio de ruedas"))
+                .andExpect(jsonPath("$.carId").value(1L))
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    void deleteIssue_ko() throws Exception{
+        Mockito.when(authService.getLoggedInUser(Mockito.any(HttpServletRequest.class))).thenReturn(userEntity);
+        Mockito.when(issueService.deleteIssueById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+
+        mockMvc.perform(delete("/api/issues/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("No se ha podido eliminar el Issue con ID: 1. Es probable que no exista o que pertenezca a otro usuario."));
     }
 }
