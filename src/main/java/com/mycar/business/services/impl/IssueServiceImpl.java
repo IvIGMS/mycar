@@ -122,6 +122,22 @@ public class IssueServiceImpl implements IssueService {
         return issues.stream().map(IssueEntity::getId).toList();
     }
 
+    @Override
+    public IssueQueryDTO deleteIssueById(Long userId, Long issueId) {
+        IssueQueryDTO result = null;
+        if(existIssueByUsername(userId, issueId)){
+            Optional<IssueEntity> issueToDelete = issueRepository.findById(issueId);
+            if(issueToDelete.isPresent()){
+                issueRepository.delete(issueToDelete.get());
+                result = issueIssueQueryDTOMapper.issueEntityToIssueQueryDTO(issueToDelete.get());
+                log.info("Issue eliminado correctamente");
+            }
+        } else {
+            log.info("El issue no existe para este usuario");
+        }
+        return result;
+    }
+
     private boolean existIssueByUsername(Long userId, Long issueId) {
         return issueRepository.existIssueByUsername(userId, issueId);
     }

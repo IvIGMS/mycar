@@ -22,4 +22,6 @@ public interface IssueService {
     List<IssueEntity> getIssuesByIds(List<Long> issues);
 
     List<Long> updateIssuesExpiredByDate();
+
+    IssueQueryDTO deleteIssueById(Long userId, Long issueId);
 }

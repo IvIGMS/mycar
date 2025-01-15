@@ -70,4 +70,16 @@ public class IssueController {
         }
         return ResponseEntity.ok(issue);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteIssue(HttpServletRequest request, @PathVariable Long id){
+        UserEntity user = authService.getLoggedInUser(request);
+        IssueQueryDTO issue = issueService.deleteIssueById(user.getId(), id);
+
+        if (issue==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se ha podido eliminar el Issue con ID: " + id + ". Es probable que no exista o que pertenezca a otro usuario.");
+        }
+        return ResponseEntity.ok(issue);
+    }
 }
