@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://localhost:5433/mycar-business
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   kafka:
     bootstrap-servers: ${KAFKA_URL}
