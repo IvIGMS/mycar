@@ -5,7 +5,7 @@ spring:
     port: ${SERVER_PORT}}
   sql:
     init:
-      mode: never
+      mode: ${SQL_INIT_MODE}
       schema-locations: classpath:org/springframework/batch/core/schema-postgresql.sql
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
